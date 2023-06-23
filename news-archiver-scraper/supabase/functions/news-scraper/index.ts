@@ -1,10 +1,41 @@
+/**
+ * Copyright 2023 Nicolas Favre
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * index.ts
+ * Function to screenshot news websites and publish them to Supabase Storage
+ *
+ * @author Nicolas Favre
+ * @date 19.06.2023
+ * @version 1.0.0
+ * @email khronozz-dev@proton.me
+ * @userid khronozz
+ */
+
+
 import {serve} from "std/server";
 import puppeteer from 'puppeteer';
+import {createClient} from "@supabase/supabase-js";
 
 serve(async () => {
     try {
         console.log("[x] Scraping news...")
 
+        // Connect to Supabase
+        const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_KEY"))
+
+        // Connect to Browserless
         const browser = await puppeteer.connect({
             browserWSEndpoint: `wss://chrome.browserless.io?token=${Deno.env.get(
                 "PUPPETEER_BROWSERLESS_IO_KEY"
@@ -18,16 +49,39 @@ serve(async () => {
             deviceScaleFactor: 3,
         });
 
+        // Screenshot Wikipedia page
         await page.goto("https://en.wikipedia.org/wiki/Rickrolling", {waitUntil: "networkidle2"});
         const screenshot = await page.screenshot();
+
+        // Set file type to png
+        const file = new File([screenshot], "rickroll.png", {type: "image/png"});
+
+        // Set filename with date
+        const date = Date.now()
+        const filename = "rickroll_" + date + ".png"
+
+        // Upload file to Supabase Storage
+        const {data, error} = await supabase.storage
+            .from("news-archives")
+            .upload("wikipedia/" + filename, file, {
+                cacheControl: "3600",
+                upsert: false,
+            });
+
+        console.log("Data returned from Supabase: ", data)
+        console.log("Error returned from Supabase: ", error)
 
         console.log("[x] Done scraping news")
         console.log("[x] Publishing news...")
         console.log("[x] Done publishing news")
 
-        return new Response(screenshot, {
-            headers: {"Content-Type": "image/png"},
-        });
+        // return new Response(screenshot, {
+        //     headers: {"Content-Type": "image/png"},
+        // });
+
+        return new Response(JSON.stringify({message: "News scraped successfully"}), {
+            headers: {"Content-Type": "application/json"},
+        })
 
     } catch (error) {
         console.log(error)
