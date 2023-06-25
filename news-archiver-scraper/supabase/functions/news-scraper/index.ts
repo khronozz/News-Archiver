@@ -57,8 +57,12 @@ serve(async () => {
                 height: 1080,
             });
 
-            // Screenshot Wikipedia page
+            // Screenshot news page
             await page.goto(newsPage.url, {waitUntil: "networkidle2"});
+
+            // Wait for page to load completely
+            await page.waitForTimeout(5000);
+
             const screenshot = await page.screenshot(
                 {fullPage: true}
             );
