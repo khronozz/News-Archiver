@@ -1,0 +1,32 @@
+{
+  "news_url": [
+    {
+      "name": "frapp",
+      "url": "https://frapp.ch/fr"
+    },
+    {
+      "name": "laliberte",
+      "url": "https://www.laliberte.ch/"
+    },
+    {
+      "name": "afp",
+      "url": "https://www.afp.com/en"
+    },
+    {
+      "name": "bbc",
+      "url": "https://www.bbc.com/"
+    },
+    {
+      "name": "cnn",
+      "url": "https://edition.cnn.com/"
+    },
+    {
+      "name": "tagesschau",
+      "url": "https://www.tagesschau.de/"
+    },
+    {
+      "name": "euronews",
+      "url": "https://www.euronews.com/"
+    }
+  ]
+}
