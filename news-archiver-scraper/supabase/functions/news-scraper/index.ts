@@ -61,7 +61,7 @@ serve(async () => {
             await page.goto(newsPage.url, {waitUntil: "networkidle2"});
 
             // Wait for page to load completely
-            await page.waitForTimeout(20000);
+            await page.waitForTimeout(5000);
 
             // Take full page screenshot
             const screenshot = await page.screenshot(

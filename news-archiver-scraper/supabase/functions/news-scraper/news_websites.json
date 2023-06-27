@@ -13,20 +13,8 @@
       "url": "https://www.afp.com/en"
     },
     {
-      "name": "bbc",
-      "url": "https://www.bbc.com/"
-    },
-    {
-      "name": "cnn",
-      "url": "https://edition.cnn.com/"
-    },
-    {
-      "name": "tagesschau",
-      "url": "https://www.tagesschau.de/"
-    },
-    {
-      "name": "euronews",
-      "url": "https://www.euronews.com/"
+      "name": "shortpedia",
+      "url": "https://www.shortpedia.com/en-in"
     }
   ]
 }
