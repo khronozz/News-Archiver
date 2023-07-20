@@ -1,13 +1,27 @@
 import dayjs, {Dayjs} from "dayjs";
 
 export const generateDate = (
-  month = dayjs().month(),
-  year = dayjs().year(),
+  month: number = dayjs().month(),
+  year: number = dayjs().year(),
+  brand: string = 'default',
+  images: any = {}
 ): [Dayjs, Dayjs] => {
   const firstDateOfMonth = dayjs().year(year).month(month).startOf('month');
   const lastDateOfMonth = dayjs().year(year).month(month).endOf('month');
 
   const arrayOfDates = [];
+  const arrayOfImageCreationDates = [];
+  if (brand !== 'default') {
+    images.forEach((image: any) => {
+      let imageCreationDate = image.name.split('_')[1];
+      imageCreationDate = imageCreationDate.split('.')[0];
+      // Convert unix timestamp to dayjs object
+      imageCreationDate = dayjs(Number(imageCreationDate));
+      if (imageCreationDate.isSame(firstDateOfMonth, 'month')) {
+        arrayOfImageCreationDates.push(imageCreationDate);
+      }
+    })
+  }
 
   // Generate prefix dates
   for (let i = 0; i < firstDateOfMonth.day(); i++) {
@@ -22,7 +36,10 @@ export const generateDate = (
     arrayOfDates.push({
       currentMonth: true,
       date: firstDateOfMonth.date(i),
-      today: dayjs().isSame(firstDateOfMonth.date(i), 'day')
+      today: dayjs().isSame(firstDateOfMonth.date(i), 'day'),
+      availableArchive: arrayOfImageCreationDates.some((imageCreationDate: any) => {
+        return imageCreationDate.isSame(firstDateOfMonth.date(i), 'day');
+      })
     });
   }
 

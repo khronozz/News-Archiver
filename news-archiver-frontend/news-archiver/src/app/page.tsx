@@ -3,8 +3,9 @@ import Image from 'next/image'
 import {generateDate, months} from "@/app/utils/calendar.ts";
 import cn from "@/app/utils/cn.ts";
 import dayjs from "dayjs";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {GrFormNext, GrFormPrevious} from "react-icons/gr";
+import {supabase} from "@/app/utils/initSupabase.ts";
 
 export default function Home() {
   const days = ["S", "M", "T", "W", "T", "F", "S"];
@@ -12,6 +13,40 @@ export default function Home() {
   const currentDate = dayjs()
   const [today, setToday] = useState(currentDate);
   const [selectedDate, setSelectedDate] = useState(currentDate);
+  const [selectedBrand, setSelectedBrand] = useState('default');
+  const [selectedImages, setSelectedImages] = useState(null);
+  const [afpImages, setAfpImages] = useState(null);
+  const [frappImages, setFrappImages] = useState(null);
+  const [laliberteImages, setLaliberteImages] = useState(null);
+  const [shortpediaImages, setShortpediaImages] = useState(null);
+
+  const fetchImages = async (brand: string, imageSetter: any) => {
+    const {data, error} = await supabase
+      .storage
+      .from('news-archives')
+      .list(brand, {
+        sortBy: {column: 'name', order: 'desc'},
+      })
+    if (error) {
+      console.log(error)
+    }
+    imageSetter(data)
+  }
+
+  useEffect(() => {
+    fetchImages('afp', setAfpImages).then(() => {
+      console.log("Fetched images from afp")
+    });
+    fetchImages('frapp', setFrappImages).then(() => {
+      console.log("Fetched images from frapp")
+    });
+    fetchImages('laliberte', setLaliberteImages).then(() => {
+      console.log("Fetched images from laliberte")
+    });
+    fetchImages('shortpedia', setShortpediaImages).then(() => {
+      console.log("Fetched images from shortpedia")
+    });
+  }, []);
 
   return (
     <main>
@@ -39,18 +74,18 @@ export default function Home() {
       <section className='py-10'>
         <div className='container px-4 mx-auto'>
           <div className='flex flex-wrap -mx-3'>
-            <div className='w-full lg:w-1/2 px-3 order-0 lg:order-0 mb-9'>
+            <div className='w-full lg:w-1/2 px-3 order-0 lg:order-0'>
               <div className='max-w-md'>
                 <h2 className='mb-4 text-3xl lg:text-4xl font-bold font-heading'>
                   Get back in time to read the latest news
                 </h2>
-                <p className='mb-6 leading-loose text-blueGray-400'>
+                <p className='leading-loose text-blueGray-400'>
                   Select a brand and an available date to read the previous headlines of
                   the chosen news website
                 </p>
 
                 <Image
-                  className='sm:max-w-sm lg:max-w-full mx-auto'
+                  className='sm:max-w-sm lg:max-w-full mx-auto mb-10 mt-4 lg:mb-0'
                   src='/browse_articles.svg'
                   alt='Browse Articles'
                   width={500}
@@ -66,7 +101,14 @@ export default function Home() {
 
                 <div className="border-b mb-8 pb-8 flex justify-center">
                   <button
-                    className="bg-[#325aff] transition-all hover:bg-blue-700 p-2 text-gray-800 font-bold rounded-l"
+                    className={
+                      "bg-[#325aff] transition-all hover:bg-blue-700 p-2 text-gray-800 font-bold border-4 rounded-l"
+                      + (selectedBrand === 'afp' ? " border-black" : " border-white")
+                    }
+                    onClick={() => {
+                      setSelectedBrand('afp')
+                      setSelectedImages(afpImages)
+                    }}
                   >
                     <Image
                       src="/afp_logo.svg"
@@ -76,7 +118,14 @@ export default function Home() {
                     />
                   </button>
                   <button
-                    className="bg-[#0f0f0f] transition-all hover:bg-gray-700 p-2 text-gray-800 font-bold"
+                    className={
+                      "bg-[#0f0f0f] transition-all hover:bg-gray-700 p-2 text-gray-800 font-bold border-4"
+                      + (selectedBrand === 'frapp' ? " border-black" : " border-white")
+                    }
+                    onClick={() => {
+                      setSelectedBrand('frapp')
+                      setSelectedImages(frappImages)
+                    }}
                   >
                     <Image
                       src="/frapp_logo.svg"
@@ -86,7 +135,14 @@ export default function Home() {
                     />
                   </button>
                   <button
-                    className="bg-[#e21922] transition-all hover:bg-red-700 p-2 text-gray-800 font-bold"
+                    className={
+                      "bg-[#e21922] transition-all hover:bg-red-700 p-2 text-gray-800 font-bold border-4"
+                      + (selectedBrand === 'laliberte' ? " border-black" : " border-white")
+                    }
+                    onClick={() => {
+                      setSelectedBrand('laliberte')
+                      setSelectedImages(laliberteImages)
+                    }}
                   >
                     <Image
                       src="/laliberte_logo.svg"
@@ -96,7 +152,14 @@ export default function Home() {
                     />
                   </button>
                   <button
-                    className="bg-[#640091] transition-all hover:bg-fuchsia-950 p-2 text-gray-800 font-bold rounded-r"
+                    className={
+                      "bg-[#640091] transition-all hover:bg-fuchsia-950 p-2 text-gray-800 font-bold rounded-r border-4"
+                      + (selectedBrand === 'shortpedia' ? " border-black" : " border-white")
+                    }
+                    onClick={() => {
+                      setSelectedBrand('shortpedia')
+                      setSelectedImages(shortpediaImages)
+                    }}
                   >
                     <Image
                       src="/shortpedia_logo.svg"
@@ -131,17 +194,28 @@ export default function Home() {
                   })}
                 </div>
                 <div className='w-full grid grid-cols-7'>
-                  {generateDate(today.month(), today.year()).map(({date, currentMonth, today}, index) => {
+                  {generateDate(
+                    today.month(), today.year(), selectedBrand, selectedImages
+                  ).map(({
+                           date,
+                           currentMonth,
+                           today,
+                           availableArchive
+                         }, index) => {
                     return (
                       <div key={index} className='h-12 border-t grid place-content-center text-sm'>
                         <h1
                           className={cn(
-                            currentMonth ? "hover:text-white hover:bg-gray-300 transition-all cursor-pointer" : "text-gray-400",
-                            today ? "bg-indigo-500 text-white" : "",
+                            currentMonth ?
+                              availableArchive ? "hover:text-white hover:bg-red-600 transition-all cursor-pointer" : "text-gray-600 cursor-not-allowed"
+                              : "text-gray-400 cursor-not-allowed",
+                            today ? "bg-indigo-500 !text-white" : "",
+                            availableArchive && !today ? "bg-black text-white" : "",
+                            selectedDate.isSame(date) && availableArchive ? "bg-red-600 !text-white" : "",
                             "h-10 w-10 rounded-full grid place-content-center"
                           )}
                           onClick={() => {
-                            if (currentMonth) {
+                            if (currentMonth && availableArchive) {
                               setSelectedDate(date)
                             }
                           }}
@@ -152,6 +226,22 @@ export default function Home() {
                     );
                   })}
                 </div>
+
+                <div className="flex">
+                  <button
+                    className="bg-gray-700 hover:bg-gray-900 transition-all text-white px-4 py-2 rounded-md mt-2"
+                    onClick={() => {
+                      console.log({
+                        "date": selectedDate.format('DD-MM-YYYY'),
+                        "website": selectedBrand,
+                      })
+                    }}
+                  >
+                    Search
+                  </button>
+
+                </div>
+
               </div>
             </div>
 
