@@ -6,11 +6,14 @@ import dayjs from "dayjs";
 import {useEffect, useState} from "react";
 import {GrFormNext, GrFormPrevious} from "react-icons/gr";
 import {supabase} from "@/app/utils/initSupabase.ts";
+import {useRouter, useSearchParams} from 'next/navigation'
 
 export default function Home() {
   const days = ["S", "M", "T", "W", "T", "F", "S"];
-
   const currentDate = dayjs()
+  const router = useRouter()
+  //const [searchParams, setSearchParams] = useSearchParams()
+
   const [today, setToday] = useState(currentDate);
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [selectedBrand, setSelectedBrand] = useState('default');
@@ -19,6 +22,7 @@ export default function Home() {
   const [frappImages, setFrappImages] = useState(null);
   const [laliberteImages, setLaliberteImages] = useState(null);
   const [shortpediaImages, setShortpediaImages] = useState(null);
+  const [validSearch, setValidSearch] = useState(false);
 
   const fetchImages = async (brand: string, imageSetter: any) => {
     const {data, error} = await supabase
@@ -35,16 +39,16 @@ export default function Home() {
 
   useEffect(() => {
     fetchImages('afp', setAfpImages).then(() => {
-      console.log("Fetched images from afp")
+      //console.log("Fetched images from afp")
     });
     fetchImages('frapp', setFrappImages).then(() => {
-      console.log("Fetched images from frapp")
+      //console.log("Fetched images from frapp")
     });
     fetchImages('laliberte', setLaliberteImages).then(() => {
-      console.log("Fetched images from laliberte")
+      //console.log("Fetched images from laliberte")
     });
     fetchImages('shortpedia', setShortpediaImages).then(() => {
-      console.log("Fetched images from shortpedia")
+      //console.log("Fetched images from shortpedia")
     });
   }, []);
 
@@ -231,10 +235,23 @@ export default function Home() {
                   <button
                     className="bg-gray-700 hover:bg-gray-900 transition-all text-white px-4 py-2 rounded-md mt-2"
                     onClick={() => {
-                      console.log({
-                        "date": selectedDate.format('DD-MM-YYYY'),
-                        "website": selectedBrand,
-                      })
+                      if (selectedBrand !== 'default' && selectedDate !== null) {
+                        setValidSearch(true)
+                        localStorage.setItem('brand', selectedBrand)
+                        localStorage.setItem('date', JSON.stringify(selectedDate))
+                        localStorage.setItem('brandImages', JSON.stringify(selectedImages))
+
+                        selectedImages.map((image, index) => {
+                          let imageCreationDate = image.name.split('_')[1];
+                          imageCreationDate = imageCreationDate.split('.')[0];
+                          imageCreationDate = dayjs(Number(imageCreationDate));
+                          if (dayjs(selectedDate).isSame(imageCreationDate, 'day')) {
+                            localStorage.setItem('imageName', image.name)
+                          }
+                        })
+
+                        router.push('/archive')
+                      }
                     }}
                   >
                     Search
