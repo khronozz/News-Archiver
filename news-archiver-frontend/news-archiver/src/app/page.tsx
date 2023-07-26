@@ -54,28 +54,28 @@ export default function Home() {
 
   return (
     <main>
-      <header>
-        <div className='container px-4 mx-auto'>
+      <header className={"ml-3 mt-3 mr-3 shadow-md"}>
+        <div className='px-4 bg-white rounded-lg'>
           <nav className='flex items-center py-6'>
             <a
-              className='block mx-auto text-3xl font-semibold leading-none'
+              className='block text-3xl font-semibold leading-none'
               href='/'
             >
               <div className='flex items-center'>
                 <Image
-                  className='lg:h-14 h-10 w-auto'
+                  className='lg:h-10 h-10 w-auto'
                   src='/archive_icon.svg'
                   alt='News Archiver'
-                  width={200}
-                  height={200}
+                  width={100}
+                  height={100}
                 />
-                <span className='ml-3 font-bold lg:text-3xl text-2xl'>News Archiver</span>
+                <span className='ml-3 font-bold lg:text-2xl text-2xl text-gray-700'>News Archiver</span>
               </div>
             </a>
           </nav>
         </div>
       </header>
-      <section className='py-10'>
+      <section className='py-10 mb-24'>
         <div className='container px-4 mx-auto'>
           <div className='flex flex-wrap -mx-3'>
             <div className='w-full lg:w-1/2 px-3 order-0 lg:order-0'>
@@ -89,7 +89,7 @@ export default function Home() {
                 </p>
 
                 <Image
-                  className='sm:max-w-sm lg:max-w-full mx-auto mb-10 mt-4 lg:mb-0'
+                  className='sm:max-w-sm lg:max-w-full mx-auto mb-10 mt-4 lg:mb-0 bg-white p-3 rounded-lg shadow-md'
                   src='/browse_articles.svg'
                   alt='Browse Articles'
                   width={500}
@@ -103,7 +103,7 @@ export default function Home() {
 
               <div className='w-96 h-96'>
 
-                <div className="border-b mb-8 pb-8 flex justify-center">
+                <div className="mb-6 flex justify-center bg-white p-2 rounded-lg shadow-md">
                   <button
                     className={
                       "bg-[#325aff] transition-all hover:bg-blue-700 p-2 text-gray-800 font-bold border-4 rounded-l"
@@ -174,9 +174,9 @@ export default function Home() {
                   </button>
                 </div>
 
-                <div className="flex justify-between">
-                  <h1 className="font-semibold">{months[today.month()]}, {today.year()}</h1>
-                  <div className="flex items-center gap-5">
+                <div className="flex justify-between bg-white pt-4 rounded-t-lg shadow-md">
+                  <h1 className="font-semibold pl-3">{months[today.month()]}, {today.year()}</h1>
+                  <div className="flex items-center gap-5 pr-3">
                     <GrFormPrevious className="w-5 h-5 cursor-pointer" onClick={() => {
                       setToday(today.subtract(1, 'month'))
                     }}/>
@@ -188,7 +188,7 @@ export default function Home() {
                     }}/>
                   </div>
                 </div>
-                <div className='w-full grid grid-cols-7'>
+                <div className='w-full grid grid-cols-7 bg-white pl-3 pr-3 shadow-md'>
                   {days.map((day, index) => {
                     return (
                       <h1 key={index} className='h-12 grid place-content-center text-sm text-gray-400'>
@@ -197,7 +197,7 @@ export default function Home() {
                     );
                   })}
                 </div>
-                <div className='w-full grid grid-cols-7'>
+                <div className='w-full grid grid-cols-7 bg-white pl-3 pr-3 rounded-b-lg shadow-md'>
                   {generateDate(
                     today.month(), today.year(), selectedBrand, selectedImages
                   ).map(({
@@ -233,7 +233,7 @@ export default function Home() {
 
                 <div className="flex">
                   <button
-                    className="bg-gray-700 hover:bg-gray-900 transition-all text-white px-4 py-2 rounded-md mt-2"
+                    className="bg-gray-700 hover:bg-gray-900 transition-all text-white px-4 py-2 rounded-md my-5 shadow-md"
                     onClick={() => {
                       if (selectedBrand !== 'default' && selectedDate !== null) {
                         setValidSearch(true)
@@ -241,7 +241,7 @@ export default function Home() {
                         localStorage.setItem('date', JSON.stringify(selectedDate))
                         localStorage.setItem('brandImages', JSON.stringify(selectedImages))
 
-                        selectedImages.map((image, index) => {
+                        selectedImages.map((image) => {
                           let imageCreationDate = image.name.split('_')[1];
                           imageCreationDate = imageCreationDate.split('.')[0];
                           imageCreationDate = dayjs(Number(imageCreationDate));
@@ -256,7 +256,6 @@ export default function Home() {
                   >
                     Search
                   </button>
-
                 </div>
 
               </div>
@@ -265,6 +264,17 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <footer className={"ml-3 mb-2 mr-3 shadow-md"}>
+        <div className='px-4 bg-gray-800 rounded-lg'>
+          <nav className='flex items-center justify-center py-6 text-gray-200'>
+            Coded with ❤️ by
+            <a href={"https://www.gitlab.com/khronozz"} className={"ml-2 mr-2 text-gray-200 hover:text-gray-400"}>
+              Khronozz
+            </a>
+          </nav>
+        </div>
+      </footer>
     </main>
   )
 }
