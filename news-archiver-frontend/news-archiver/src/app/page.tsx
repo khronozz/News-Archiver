@@ -240,6 +240,7 @@ export default function Home() {
                         localStorage.setItem('brand', selectedBrand)
                         localStorage.setItem('date', JSON.stringify(selectedDate))
                         localStorage.setItem('brandImages', JSON.stringify(selectedImages))
+                        const imageArray = [];
 
                         selectedImages.map((image) => {
                           let imageCreationDate = image.name.split('_')[1];
@@ -248,8 +249,15 @@ export default function Home() {
                           if (dayjs(selectedDate).isSame(imageCreationDate, 'day')) {
                             localStorage.setItem('imageName', image.name)
                           }
+                          if (dayjs(selectedDate).isSame(imageCreationDate, 'month')) {
+                            imageArray.push({date: imageCreationDate, name: image.name})
+                          }
                         })
-
+                        //Sort the array by date
+                        imageArray.sort((a, b) => {
+                          return a.date - b.date
+                        })
+                        localStorage.setItem('imageArray', JSON.stringify(imageArray))
                         router.push('/archive')
                       }
                     }}
