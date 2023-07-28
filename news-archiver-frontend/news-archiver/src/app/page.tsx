@@ -1,11 +1,11 @@
 'use client'
 import Image from 'next/image'
-import {generateDate, months} from "@/app/utils/calendar.ts";
-import cn from "@/app/utils/cn.ts";
+import {generateDate, months} from "@/app/(utils)/calendar.ts";
+import cn from "@/app/(utils)/cn.ts";
 import dayjs from "dayjs";
 import {useEffect, useState} from "react";
 import {GrFormNext, GrFormPrevious} from "react-icons/gr";
-import {supabase} from "@/app/utils/initSupabase.ts";
+import {supabase} from "@/app/(utils)/initSupabase.ts";
 import {useRouter, useSearchParams} from 'next/navigation'
 
 export default function Home() {
@@ -54,9 +54,9 @@ export default function Home() {
 
   return (
     <main>
-      <header className={"ml-3 mt-3 mr-3 shadow-md"}>
+      <header className={"ml-1 mt-1 mr-1 shadow-md"}>
         <div className='px-4 bg-white rounded-lg'>
-          <nav className='flex items-center py-6'>
+          <nav className='flex items-center justify-center py-6'>
             <a
               className='block text-3xl font-semibold leading-none'
               href='/'
@@ -75,10 +75,10 @@ export default function Home() {
           </nav>
         </div>
       </header>
-      <section className='py-10 mb-24'>
+      <section className='py-10 mb-28'>
         <div className='container px-4 mx-auto'>
           <div className='flex flex-wrap -mx-3'>
-            <div className='w-full lg:w-1/2 px-3 order-0 lg:order-0'>
+            <div className='w-full lg:w-1/2 px-3 order-0 lg:order-0 flex justify-center'>
               <div className='max-w-md'>
                 <h2 className='mb-4 text-3xl lg:text-4xl font-bold font-heading'>
                   Get back in time to read the latest news
@@ -180,7 +180,7 @@ export default function Home() {
                     <GrFormPrevious className="w-5 h-5 cursor-pointer" onClick={() => {
                       setToday(today.subtract(1, 'month'))
                     }}/>
-                    <h1 className="cursor-pointer" onClick={() => {
+                    <h1 className="cursor-pointer font-semibold" onClick={() => {
                       setToday(currentDate)
                     }}>Today</h1>
                     <GrFormNext className="w-5 h-5 cursor-pointer" onClick={() => {
@@ -273,7 +273,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className={"ml-3 mb-2 mr-3 shadow-md"}>
+      <footer className={"ml-1 mb-1 mr-1 shadow-md"}>
         <div className='px-4 bg-gray-800 rounded-lg'>
           <nav className='flex items-center justify-center py-6 text-gray-200'>
             Coded with ❤️ by

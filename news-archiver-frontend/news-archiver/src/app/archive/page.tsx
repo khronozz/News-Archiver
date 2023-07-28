@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation'
 import Link from "next/link";
 import dayjs from "dayjs";
 import Image from "next/image";
-import cn from "@/app/utils/cn.ts";
+import cn from "@/app/(utils)/cn.ts";
 
 export default function Archive() {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,23 +16,66 @@ export default function Archive() {
   const [bucketUrl, setBucketUrl] = useState("No Bucket set");
   const [imageArray, setImageArray] = useState([]);
   const [imageIndex, setImageIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
-  //const router = useRouter();
+  const router = useRouter();
 
   const getImageUrl = (brand, imageName) => {
     return bucketUrl + brand + '/' + imageName;
   }
 
+  /**
+   * This useEffect is used to get the data from localStorage
+   */
   useEffect(() => {
-    setBrand(localStorage.getItem('brand'));
-    setDate(dayjs(JSON.parse(localStorage.getItem('date'))));
-    setBrandImages(JSON.parse(localStorage.getItem('brandImages')));
-    setImageName(localStorage.getItem('imageName'));
-    setImageArray(JSON.parse(localStorage.getItem('imageArray')));
+    let brandData;
+    try {
+      brandData = localStorage.getItem('brand');
+    } catch {
+      brandData = null;
+    }
+    setBrand(brandData ? brandData : "No Brand Selected");
+
+    let dateData;
+    try {
+      dateData = JSON.parse(localStorage.getItem('date'));
+    } catch {
+      dateData = null;
+    }
+    setDate(dateData ? dayjs(dateData) : dayjs());
+
+    let brandImagesData;
+    try {
+      brandImagesData = JSON.parse(localStorage.getItem('brandImages'));
+    } catch {
+      brandImagesData = null;
+    }
+    setBrandImages(brandImagesData ? brandImagesData : []);
+
+    let imageData;
+    try {
+      imageData = localStorage.getItem('imageName');
+    } catch {
+      imageData = null;
+    }
+    setImageName(imageData ? imageData : "No Name");
+
+    let imageArrayData;
+    try {
+      imageArrayData = JSON.parse(localStorage.getItem('imageArray'));
+    } catch {
+      imageArrayData = null;
+    }
+    setImageArray(imageArrayData ? imageArrayData : []);
+
     setBucketUrl(
       process.env.NEXT_PUBLIC_SUPABASE_URL
       + '/storage/v1/object/public/news-archives/'
     );
+    // Check if localStorage hasn't been set
+    if (!brandData && !dateData && !brandImagesData && !imageData && !imageArrayData) {
+      router.push('/error404');
+    }
   }, [])
 
   useEffect(() => {
@@ -52,22 +95,19 @@ export default function Archive() {
     }
   }, [imageArray])
 
-  // useEffect(() => {
-  //   if (brand === "No Brand Selected" && date === null) {
-  //     router.back()
-  //   }
-  // }, [brand, date])
-
   if (isLoading) {
     return (
-      <main>
-        <header className={"ml-3 mt-3 mr-3 shadow-md"}>
+      <main className='flex-grow'>
+        <header className={"m-1 shadow-md"}>
           <div className='px-4 bg-white rounded-lg'>
-            <nav className='flex items-center justify-between py-6'>
-              <div>
+            <nav className='md:flex items-center md:justify-between py-6'>
+              <div className={"mb-2 md:mb-0 flex justify-center"}>
                 <a
                   className='block text-3xl font-semibold leading-none'
                   href='/'
+                  onClick={() => {
+                    localStorage.clear();
+                  }}
                 >
                   <div className='flex items-center'>
                     <Image
@@ -82,9 +122,14 @@ export default function Archive() {
                 </a>
               </div>
 
-              <div>
+              <div className={"mb-12 md:mb-0 flex justify-center"}>
                 <Link href={"/"}>
-                  <button className={"bg-gray-300 hover:bg-gray-400 text-gray-700 font-extrabold py-2 px-4 rounded"}>
+                  <button
+                    className={"bg-gray-300 hover:bg-gray-400 text-gray-700 font-extrabold py-2 px-4 rounded"}
+                    onClick={() => {
+                      localStorage.clear();
+                    }}
+                  >
                     Home
                   </button>
                 </Link>
@@ -104,15 +149,18 @@ export default function Archive() {
   }
 
   return (
-    <main>
+    <div className='flex flex-col min-h-screen'>
 
-      <header className={"ml-3 mt-3 mr-3 shadow-md"}>
+      <header className={"m-1 shadow-md"}>
         <div className='px-4 bg-white rounded-lg'>
-          <nav className='flex items-center justify-between py-6'>
-            <div>
+          <nav className='md:flex items-center md:justify-between py-6'>
+            <div className={"mb-2 md:mb-0 flex justify-center"}>
               <a
                 className='block text-3xl font-semibold leading-none'
                 href='/'
+                onClick={() => {
+                  localStorage.clear();
+                }}
               >
                 <div className='flex items-center'>
                   <Image
@@ -127,15 +175,20 @@ export default function Archive() {
               </a>
             </div>
 
-            <div>
+            <div className={"mb-2 md:mb-0 flex justify-center"}>
               <Link href={"/"}>
-                <button className={"bg-gray-300 hover:bg-gray-400 text-gray-700 font-extrabold py-2 px-4 rounded"}>
+                <button
+                  className={"bg-gray-300 hover:bg-gray-400 text-gray-700 font-extrabold py-2 px-4 rounded"}
+                  onClick={() => {
+                    localStorage.clear();
+                  }}
+                >
                   Home
                 </button>
               </Link>
             </div>
 
-            <div className={"flex justify-between"}>
+            <div className={"flex justify-center md:justify-between"}>
               <Link href={""}>
                 <button
                   className={cn(
@@ -149,6 +202,7 @@ export default function Archive() {
                       setDate(dayjs(imageArray[imageIndex - 1].date));
                       setImageName(imageArray[imageIndex - 1].name);
                       setImageIndex(imageIndex - 1);
+                      setImageLoaded(false)
                     }
                   }}
                 >
@@ -171,6 +225,7 @@ export default function Archive() {
                       setDate(dayjs(imageArray[imageIndex + 1].date));
                       setImageName(imageArray[imageIndex + 1].name);
                       setImageIndex(imageIndex + 1);
+                      setImageLoaded(false)
                     }
                   }}
                 >
@@ -182,20 +237,40 @@ export default function Archive() {
         </div>
       </header>
 
-      <section className={"py-4"}>
-        <div className={"flex flex-col items-center justify-center"}>
+      <main className='flex-grow'>
+        <section>
           <div className={"flex flex-col items-center justify-center"}>
-            <Image
-              src={currentImageUrl}
-              alt={imageName}
-              width={1920}
-              height={1080}
-            />
-          </div>
-        </div>
-      </section>
+            <div className={"flex flex-col items-center justify-center"}>
 
-      <footer className={"ml-3 mb-3 mr-3 shadow-md"}>
+              {/* Loading animation */}
+              {!imageLoaded &&
+                <div className={"flex flex-col items-center justify-center mt-20"}>
+                  <div className={"animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"}/>
+                  <div className={"mt-5 flex justify-center"}>
+                    <h2 className="text-4xl text-indigo-600 font-extrabold tracking-px-2n leading-none">
+                      Image Loading
+                    </h2>
+                  </div>
+                </div>
+              }
+
+              <Image
+                className={"rounded-md"}
+                src={currentImageUrl}
+                alt={imageName}
+                width={1920}
+                height={1080}
+                // style={imageLoaded ? {} : {display: "none"}}
+                onLoad={() => {
+                  setImageLoaded(true)
+                }}
+              />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className={"m-1 shadow-md"}>
         <div className='px-4 bg-gray-800 rounded-lg'>
           <nav className='flex items-center justify-center py-6 text-gray-200'>
             Coded with ❤️ by
@@ -205,7 +280,6 @@ export default function Archive() {
           </nav>
         </div>
       </footer>
-
-    </main>
+    </div>
   )
 }
