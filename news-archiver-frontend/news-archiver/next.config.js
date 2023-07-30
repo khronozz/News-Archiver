@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL.toString().replace('https://', ''),
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL,
       },
     ],
   },

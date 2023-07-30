@@ -89,7 +89,7 @@ export default function Archive() {
     setImageArray(imageArrayData ? imageArrayData : []);
 
     setBucketUrl(
-      process.env.NEXT_PUBLIC_SUPABASE_URL
+      "https://" + process.env.NEXT_PUBLIC_SUPABASE_URL
       + '/storage/v1/object/public/news-archives/'
     );
     // Check if localStorage hasn't been set
@@ -287,7 +287,7 @@ export default function Archive() {
                   setImageLoaded(true)
                 }}
               />
-              
+
             </div>
           </div>
         </section>

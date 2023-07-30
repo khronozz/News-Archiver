@@ -17,6 +17,9 @@ containerize-development-frontend:
   services:
     - docker:24.0.3-dind
   script:
+    - export NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+    - export NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - export BUCKET_PUBLIC_URL=$BUCKET_PUBLIC_URL
     - cd news-archiver-frontend/news-archiver
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:dev || true
@@ -34,6 +37,9 @@ containerize-production-frontend:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   script:
+    - export NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+    - export NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - export BUCKET_PUBLIC_URL=$BUCKET_PUBLIC_URL
     - cd news-archiver-frontend/news-archiver
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:latest || true
