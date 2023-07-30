@@ -11,9 +11,9 @@ test-frontend:
 
 containerize-development-frontend:
   stage: build
-  image:
-    name: docker:24.0.3
-    entrypoint: [ "" ]
+  image: docker:24.0.3
+  variables:
+    DOCKER_DRIVER: overlay2
   services:
     - docker:24.0.3-dind
   script:
@@ -26,9 +26,9 @@ containerize-development-frontend:
 
 containerize-production-frontend:
   stage: build
-  image:
-    name: docker:24.0.3
-    entrypoint: [ "" ]
+  image: docker:24.0.3
+  variables:
+    DOCKER_DRIVER: overlay2
   services:
     - docker:24.0.3-dind
   rules:
