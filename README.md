@@ -1,6 +1,17 @@
-# News Archiver
 
-News page archiver. Get back in time to read the latest news.
+
+# <img src="res/news_archiver_icon.svg" width="150"> News Archiver
+
+![Pipeline Status](https://gitlab.com/khronozz/news-archiver/badges/main/pipeline.svg)
+![License](https://img.shields.io/gitlab/license/khronozz/news-archiver)
+![node](https://img.shields.io/badge/node-18.14.2-blue.svg?logo=nodedotjs)
+![next](https://img.shields.io/badge/next-13.4.7-blue.svg?logo=nextdotjs)
+![docker](https://img.shields.io/badge/docker-24.0.3-blue.svg?logo=docker)
+![supabase](https://img.shields.io/badge/supabase-1.68.6-blue.svg?logo=supabase)
+![tailwindcss](https://img.shields.io/badge/tailwindcss-3.3.2-blue.svg?logo=tailwindcss)
+![typescript](https://img.shields.io/badge/typescript-5.1.3-blue.svg?logo=typescript)
+
+News page archiver. Get back in time to read the latest news headlines.
 
 ## Getting Started
 
