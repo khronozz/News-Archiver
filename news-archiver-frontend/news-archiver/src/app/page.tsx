@@ -1,13 +1,62 @@
+/**
+ * Copyright 2023 Nicolas Favre
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * page.tsx
+ * Main page of the application
+ *
+ * @author Nicolas Favre
+ * @date 29.07.2023
+ * @version 1.0.0
+ * @email khronozz-dev@proton.me
+ * @userid khronozz
+ */
+
 'use client'
 import Image from 'next/image'
 import {generateDate, months} from "@/app/(utils)/calendar.ts";
 import cn from "@/app/(utils)/cn.ts";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import {useEffect, useState} from "react";
 import {GrFormNext, GrFormPrevious} from "react-icons/gr";
 import {supabase} from "@/app/(utils)/initSupabase.ts";
-import {useRouter, useSearchParams} from 'next/navigation'
+import {useRouter} from 'next/navigation'
 
+/**
+ * Interface for the metadata of an image fetched from supabase
+ */
+interface IFileMetadata {
+  createdAt: string,
+  id: number,
+  lastAccessedAt: string
+  metadata: {
+    cacheControl: string,
+    contentLength: number,
+    eTag: string,
+    httpStatusCode: number,
+    lastModified: string,
+    mimeType: string,
+    size: number
+  }
+  name: string,
+  updatedAt: string,
+}
+
+/**
+ * Main page of the application
+ * @constructor
+ */
 export default function Home() {
   const days = ["S", "M", "T", "W", "T", "F", "S"];
   const currentDate = dayjs()
@@ -17,7 +66,7 @@ export default function Home() {
   const [today, setToday] = useState(currentDate);
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [selectedBrand, setSelectedBrand] = useState('default');
-  const [selectedImages, setSelectedImages] = useState(null);
+  const [selectedImages, setSelectedImages] = useState<IFileMetadata[] | null>(null);
   const [afpImages, setAfpImages] = useState(null);
   const [frappImages, setFrappImages] = useState(null);
   const [laliberteImages, setLaliberteImages] = useState(null);
@@ -239,23 +288,22 @@ export default function Home() {
                         setValidSearch(true)
                         localStorage.setItem('brand', selectedBrand)
                         localStorage.setItem('date', JSON.stringify(selectedDate))
-                        localStorage.setItem('brandImages', JSON.stringify(selectedImages))
-                        const imageArray = [];
+                        const imageArray: { date: dayjs.Dayjs, name: string }[] = []
 
-                        selectedImages.map((image) => {
+                        selectedImages?.map((image) => {
                           let imageCreationDate = image.name.split('_')[1];
                           imageCreationDate = imageCreationDate.split('.')[0];
-                          imageCreationDate = dayjs(Number(imageCreationDate));
-                          if (dayjs(selectedDate).isSame(imageCreationDate, 'day')) {
+                          let imageCreationDateObject: Dayjs = dayjs(Number(imageCreationDate));
+                          if (dayjs(selectedDate).isSame(imageCreationDateObject, 'day')) {
                             localStorage.setItem('imageName', image.name)
                           }
-                          if (dayjs(selectedDate).isSame(imageCreationDate, 'month')) {
-                            imageArray.push({date: imageCreationDate, name: image.name})
+                          if (dayjs(selectedDate).isSame(imageCreationDateObject, 'month')) {
+                            imageArray.push({date: imageCreationDateObject, name: image.name})
                           }
                         })
                         //Sort the array by date
-                        imageArray.sort((a, b) => {
-                          return a.date - b.date
+                        imageArray.sort((a: { date: Dayjs, name: string }, b: { date: Dayjs, name: string }) => {
+                          return a.date.isAfter(b.date) ? 1 : -1
                         })
                         localStorage.setItem('imageArray', JSON.stringify(imageArray))
                         router.push('/archive')

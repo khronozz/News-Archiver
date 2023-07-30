@@ -1,0 +1,43 @@
+stages:
+  - test
+  - build
+
+test-frontend:
+  stage: test
+  image: node:18.14.2
+  script:
+    - cd news-archiver-frontend/news-archiver
+    - npm install
+
+containerize-development-frontend:
+  stage: build
+  image:
+    name: docker:24.0.3
+    entrypoint: [ "" ]
+  services:
+    - docker:24.0.3-dind
+  script:
+    - cd news-archiver-frontend/news-archiver
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:dev || true
+    - docker build -t registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:dev .
+    - docker push registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:dev
+    - docker logout $CI_REGISTRY
+
+containerize-production-frontend:
+  stage: build
+  image:
+    name: docker:24.0.3
+    entrypoint: [ "" ]
+  services:
+    - docker:24.0.3-dind
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - cd news-archiver-frontend/news-archiver
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:latest || true
+    - docker build -t registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:latest .
+    - docker push registry.gitlab.com/khronozz/news-archiver/news-archiver-frontend:latest
+    - docker logout $CI_REGISTRY
+

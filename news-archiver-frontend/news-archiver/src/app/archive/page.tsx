@@ -1,17 +1,45 @@
+/**
+ * Copyright 2023 Nicolas Favre
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * page.tsx
+ * Page for displaying the archived news page screenshot
+ *
+ * @author Nicolas Favre
+ * @date 29.07.2023
+ * @version 1.0.0
+ * @email khronozz-dev@proton.me
+ * @userid khronozz
+ */
+
 'use client'
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useRouter} from 'next/navigation'
 import Link from "next/link";
 import dayjs from "dayjs";
 import Image from "next/image";
 import cn from "@/app/(utils)/cn.ts";
 
+/**
+ * Page for displaying the archived news page screenshot
+ * @constructor
+ */
 export default function Archive() {
   const [isLoading, setIsLoading] = useState(true);
   const [brand, setBrand] = useState("No Brand Selected");
   const [date, setDate] = useState(dayjs());
   const [imageName, setImageName] = useState("No Name");
-  const [brandImages, setBrandImages] = useState(null);
   const [currentImageUrl, setCurrentImageUrl] = useState("No URL set");
   const [bucketUrl, setBucketUrl] = useState("No Bucket set");
   const [imageArray, setImageArray] = useState([]);
@@ -20,13 +48,13 @@ export default function Archive() {
 
   const router = useRouter();
 
-  const getImageUrl = (brand, imageName) => {
-    return bucketUrl + brand + '/' + imageName;
-  }
+  // Function to concatenate the screenshot URL
+  const getImageUrl = useCallback(
+    (brand: string, imageName: string) => {
+      return bucketUrl + brand + '/' + imageName;
+    }, [bucketUrl]);
 
-  /**
-   * This useEffect is used to get the data from localStorage
-   */
+  // Load data from localStorage
   useEffect(() => {
     let brandData;
     try {
@@ -38,19 +66,11 @@ export default function Archive() {
 
     let dateData;
     try {
-      dateData = JSON.parse(localStorage.getItem('date'));
+      dateData = JSON.parse(localStorage.getItem('date') || '{}');
     } catch {
       dateData = null;
     }
     setDate(dateData ? dayjs(dateData) : dayjs());
-
-    let brandImagesData;
-    try {
-      brandImagesData = JSON.parse(localStorage.getItem('brandImages'));
-    } catch {
-      brandImagesData = null;
-    }
-    setBrandImages(brandImagesData ? brandImagesData : []);
 
     let imageData;
     try {
@@ -62,7 +82,7 @@ export default function Archive() {
 
     let imageArrayData;
     try {
-      imageArrayData = JSON.parse(localStorage.getItem('imageArray'));
+      imageArrayData = JSON.parse(localStorage.getItem('imageArray') || '{}');
     } catch {
       imageArrayData = null;
     }
@@ -73,28 +93,31 @@ export default function Archive() {
       + '/storage/v1/object/public/news-archives/'
     );
     // Check if localStorage hasn't been set
-    if (!brandData && !dateData && !brandImagesData && !imageData && !imageArrayData) {
+    if (!brandData && !dateData && !imageData && !imageArrayData) {
       router.push('/error404');
     }
-  }, [])
+  }, [router])
 
+  // Load the image URL
   useEffect(() => {
     if (brand !== "No Brand Selected" && imageName !== "No Name") {
       setCurrentImageUrl(getImageUrl(brand, imageName));
       setIsLoading(false);
     }
-  }, [brand, imageName])
+  }, [brand, imageName, getImageUrl])
 
+  // Set the index of the image in the array of screenshots taken before and after the current date
   useEffect(() => {
     if (imageArray.length > 0) {
       imageArray.forEach((image, index) => {
-        if (image.name === imageName) {
+        if (image['name'] === imageName) {
           setImageIndex(index);
         }
       })
     }
-  }, [imageArray])
+  }, [imageArray, imageName])
 
+  // Check if the image is loaded
   if (isLoading) {
     return (
       <main className='flex-grow'>
@@ -199,8 +222,8 @@ export default function Archive() {
                   onClick={() => {
                     if (imageIndex > 0) {
                       setIsLoading(true);
-                      setDate(dayjs(imageArray[imageIndex - 1].date));
-                      setImageName(imageArray[imageIndex - 1].name);
+                      setDate(dayjs(imageArray[imageIndex - 1]['date']));
+                      setImageName(imageArray[imageIndex - 1]['name']);
                       setImageIndex(imageIndex - 1);
                       setImageLoaded(false)
                     }
@@ -222,8 +245,8 @@ export default function Archive() {
                   onClick={() => {
                     if (imageIndex < imageArray.length - 1) {
                       setIsLoading(true);
-                      setDate(dayjs(imageArray[imageIndex + 1].date));
-                      setImageName(imageArray[imageIndex + 1].name);
+                      setDate(dayjs(imageArray[imageIndex + 1]['date']));
+                      setImageName(imageArray[imageIndex + 1]['name']);
                       setImageIndex(imageIndex + 1);
                       setImageLoaded(false)
                     }
@@ -242,7 +265,7 @@ export default function Archive() {
           <div className={"flex flex-col items-center justify-center"}>
             <div className={"flex flex-col items-center justify-center"}>
 
-              {/* Loading animation */}
+              {/* Loading animation until the image is loaded */}
               {!imageLoaded &&
                 <div className={"flex flex-col items-center justify-center mt-20"}>
                   <div className={"animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"}/>
@@ -254,17 +277,17 @@ export default function Archive() {
                 </div>
               }
 
-              <Image
+              <img
                 className={"rounded-md"}
                 src={currentImageUrl}
                 alt={imageName}
                 width={1920}
                 height={1080}
-                // style={imageLoaded ? {} : {display: "none"}}
                 onLoad={() => {
                   setImageLoaded(true)
                 }}
               />
+              
             </div>
           </div>
         </section>
