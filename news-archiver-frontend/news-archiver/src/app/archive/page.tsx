@@ -93,7 +93,7 @@ export default function Archive() {
       + '/storage/v1/object/public/news-archives/'
     );
     // Check if localStorage hasn't been set
-    if (!brandData && !dateData && !imageData && !imageArrayData) {
+    if (!brandData || !dateData || !imageData || !imageArrayData) {
       router.push('/error404');
     }
   }, [router])
